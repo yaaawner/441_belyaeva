@@ -12,7 +12,7 @@ using System.Collections.Concurrent;
 
 
 // TODO: 
-// console input
+// 
 // more tests
 // cancelling
 // info of object
@@ -107,11 +107,12 @@ namespace ModelLibrary
             sw.Stop();
 
             Console.WriteLine($"Done in {sw.ElapsedMilliseconds}ms.");
+            Console.WriteLine("List of finding objects: ");
             foreach (string obj in detectedObjects)
             {
                 Console.WriteLine(obj);
             }
-            Console.WriteLine(detectedObjects.Count.ToString());
+            Console.WriteLine($"Total number of objects: {detectedObjects.Count}");
         }
     }
 }
