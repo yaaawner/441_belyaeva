@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-//using Detector;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
+﻿using System.Threading.Tasks;
 using ModelLibrary;
 
 namespace ConsoleApp
@@ -14,7 +9,6 @@ namespace ConsoleApp
         {
             string imageFolder = @"D:\models\Assets\Images";
             await Detector.DetectImage(imageFolder);
-
         }
     }
 }

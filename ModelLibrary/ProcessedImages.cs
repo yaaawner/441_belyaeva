@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
 
 namespace ModelLibrary
@@ -16,11 +13,10 @@ namespace ModelLibrary
             countOfImages = count;
         } 
 
-        public void AddToBag (string image)
+        public void Add (string image)
         {
             bag.Add(image);
             Console.Clear();
-            //Console.WriteLine(bag.Count.ToString());
             Console.WriteLine(((double)bag.Count / countOfImages * 100).ToString() + "%");
         }
     }
