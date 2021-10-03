@@ -4,8 +4,9 @@ using System.Text;
 //using Detector;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using ModelLibrary;
 
-namespace YOLOv4MLNet
+namespace ConsoleApp
 {
     class Program
     {

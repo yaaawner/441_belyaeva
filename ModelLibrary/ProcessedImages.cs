@@ -4,7 +4,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
-namespace YOLOv4MLNet
+namespace ModelLibrary
 {
     class ProcessedImages
     {

@@ -14,13 +14,15 @@ using System.Collections.Concurrent;
 //using System.Collections.Generic;
 
 
-// TODO: split code to libs
+// TODO: split classes and methods
 // console input
 // more tests
+// cancelling
+// info of object
 
-namespace YOLOv4MLNet
+namespace ModelLibrary
 {
-    class Detector
+    public class Detector
     {
         // model is available here:
         // https://github.com/onnx/models/tree/master/vision/object_detection_segmentation/yolov4
