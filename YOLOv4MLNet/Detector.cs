@@ -10,6 +10,13 @@ using static Microsoft.ML.Transforms.Image.ImageResizingEstimator;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Globalization;
+using System.Collections.Concurrent;
+//using System.Collections.Generic;
+
+
+// TODO: split code to libs
+// console input
+// more tests
 
 namespace YOLOv4MLNet
 {
@@ -95,11 +102,14 @@ namespace YOLOv4MLNet
 
             // save model
             //mlContext.Model.Save(model, predictionEngine.OutputSchema, Path.ChangeExtension(modelPath, "zip"));
+            //ConcurrentBag<string> processedImages = new ConcurrentBag<string>();
+            ConcurrentBag<string> detectedObjects = new ConcurrentBag<string>();
             var sw = new Stopwatch();
             sw.Start();
 
 
-            string[] imageNames = Directory.GetFiles(imageFolder); ;
+            string[] imageNames = Directory.GetFiles(imageFolder);
+            ProcessedImages processedImages = new ProcessedImages(imageNames.Length);
             object locker = new object();
             
             var ab = new ActionBlock<string>(async image => {
@@ -111,11 +121,13 @@ namespace YOLOv4MLNet
                         // predict
                         predict = predictionEngine.Predict(new YoloV4BitmapData() { Image = bitmap });
                     }
+                    processedImages.AddToBag(image);
                 }
                 var results = predict.GetResults(classesNames, 0.3f, 0.7f);
                 foreach (var res in results)
                 {
-                    printResult(res);
+                    //printResult(res);
+                    detectedObjects.Add(res.Label);
                 }
             },
             new ExecutionDataflowBlockOptions
@@ -166,6 +178,11 @@ namespace YOLOv4MLNet
 
 
             Console.WriteLine($"Done in {sw.ElapsedMilliseconds}ms.");
+            foreach (string obj in detectedObjects)
+            {
+                Console.WriteLine(obj);
+            }
+            Console.WriteLine(detectedObjects.Count.ToString());
         }
     }
 }
