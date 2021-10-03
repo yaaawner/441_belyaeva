@@ -15,7 +15,7 @@ using System.Collections.Concurrent;
 // 
 // more tests
 // cancelling
-// info of object
+// 
 
 namespace ModelLibrary
 {
@@ -73,7 +73,7 @@ namespace ModelLibrary
             // Create prediction engine
             var predictionEngine = mlContext.Model.CreatePredictionEngine<YoloV4BitmapData, YoloV4Prediction>(model);
 
-            ConcurrentBag<string> detectedObjects = new ConcurrentBag<string>();
+            ConcurrentBag<YoloV4Result> detectedObjects = new ConcurrentBag<YoloV4Result>();
             string[] imageNames = Directory.GetFiles(imageFolder);
             ProcessedImages processedImages = new ProcessedImages(imageNames.Length);
             object locker = new object();
@@ -93,7 +93,7 @@ namespace ModelLibrary
                 var results = predict.GetResults(classesNames, 0.3f, 0.7f);
                 foreach (var res in results)
                 {
-                    detectedObjects.Add(res.Label);
+                    detectedObjects.Add(res); 
                 }
             },
             new ExecutionDataflowBlockOptions
@@ -108,9 +108,13 @@ namespace ModelLibrary
 
             Console.WriteLine($"Done in {sw.ElapsedMilliseconds}ms.");
             Console.WriteLine("List of finding objects: ");
-            foreach (string obj in detectedObjects)
+            foreach (var obj in detectedObjects)
             {
-                Console.WriteLine(obj);
+                var x1 = obj.BBox[0];
+                var y1 = obj.BBox[1];
+                var x2 = obj.BBox[2];
+                var y2 = obj.BBox[3];
+                Console.WriteLine($"[left,top,right,bottom]:[{x1}, {y1}, {x2}, {y2}] object {obj.Label}");
             }
             Console.WriteLine($"Total number of objects: {detectedObjects.Count}");
         }
