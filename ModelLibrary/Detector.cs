@@ -10,13 +10,6 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Collections.Concurrent;
 
-
-// TODO: 
-// 
-// more tests
-// cancelling
-// 
-
 namespace ModelLibrary
 {
     public class Detector
