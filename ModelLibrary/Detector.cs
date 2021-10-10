@@ -69,11 +69,11 @@ namespace ModelLibrary
             ConcurrentBag<YoloV4Result> detectedObjects = new ConcurrentBag<YoloV4Result>();
             string[] imageNames = Directory.GetFiles(imageFolder);
             ProcessedImages processedImages = new ProcessedImages(imageNames.Length);
-            object locker = new object();
+            //object locker = new object();
 
             var sw = new Stopwatch();
             sw.Start();
-            
+            /*
             var ab = new ActionBlock<string>(async image => {
                 YoloV4Prediction predict;
                 lock (locker)
@@ -97,8 +97,58 @@ namespace ModelLibrary
             Parallel.For(0, imageNames.Length, i => ab.Post(imageNames[i]));
             ab.Complete();
             await ab.Completion;
-            sw.Stop();
+            */
 
+            // 3 action blocks
+            var bitmapBlock = new TransformBlock<string, Bitmap>(image =>
+            {
+                var bitmap = new Bitmap(Image.FromFile(Path.Combine(image)));
+                return bitmap;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount
+            });
+
+            var predictBlock = new TransformBlock<Bitmap, YoloV4Prediction>(bitmap =>
+            {
+                YoloV4Prediction predict = predictionEngine.Predict(new YoloV4BitmapData() { Image = bitmap });
+                processedImages.Add(bitmap);
+                return predict;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                MaxDegreeOfParallelism = 1,
+            });
+
+            var resultBlock = new ActionBlock<YoloV4Prediction>(predict =>
+            {
+                var results = predict.GetResults(classesNames, 0.3f, 0.7f);
+                foreach (var res in results)
+                {
+                    detectedObjects.Add(res);
+                    var x1 = res.BBox[0];
+                    var y1 = res.BBox[1];
+                    var x2 = res.BBox[2];
+                    var y2 = res.BBox[3];
+                    Console.WriteLine($"[left,top,right,bottom]:[{x1}, {y1}, {x2}, {y2}] object {res.Label}");
+                }
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount
+            });
+
+            var link = new DataflowLinkOptions { PropagateCompletion = true };
+            bitmapBlock.LinkTo(predictBlock, link);
+            predictBlock.LinkTo(resultBlock, link);
+
+            Parallel.For(0, imageNames.Length, i => bitmapBlock.Post(imageNames[i]));
+            bitmapBlock.Complete();
+            await resultBlock.Completion;
+            sw.Stop();
+            
+            
             Console.WriteLine($"Done in {sw.ElapsedMilliseconds}ms.");
             Console.WriteLine("List of finding objects: ");
             foreach (var obj in detectedObjects)
@@ -110,6 +160,7 @@ namespace ModelLibrary
                 Console.WriteLine($"[left,top,right,bottom]:[{x1}, {y1}, {x2}, {y2}] object {obj.Label}");
             }
             Console.WriteLine($"Total number of objects: {detectedObjects.Count}");
+            
         }
     }
 }
