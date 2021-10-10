@@ -91,7 +91,7 @@ namespace ModelLibrary
             },
             new ExecutionDataflowBlockOptions
             {
-                MaxDegreeOfParallelism = 4
+                MaxDegreeOfParallelism = Environment.ProcessorCount
             });
 
             Parallel.For(0, imageNames.Length, i => ab.Post(imageNames[i]));
