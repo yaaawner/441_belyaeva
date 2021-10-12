@@ -23,11 +23,20 @@ namespace ModelLibrary
             countOfImages = count;
         } 
 
-        public void Add (Bitmap bitmap)
+        public string Add (Bitmap bitmap)
         {
             bag.Add(bitmap);
             //Console.Clear();
-            Console.WriteLine(((double)bag.Count / countOfImages * 100).ToString() + "%");
+            //Detector.bufferBlock.SendAsync(((double)bag.Count / countOfImages * 100).ToString() + "%");
+            //Console.WriteLine(((double)bag.Count / countOfImages * 100).ToString() + "%");
+            return ((double)bag.Count / countOfImages * 100).ToString() + "%";
         }
+
+        /*
+        public string Percent()
+        {
+            return ((double)bag.Count / countOfImages * 100).ToString() + "%";
+        }
+        */
     }
 }

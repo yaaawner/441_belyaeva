@@ -12,6 +12,7 @@ using System.Collections.Concurrent;
 
 namespace ModelLibrary
 {
+    //var bufferBlock = new BufferBlock<int>();
     public class Detector
     {
         // model is available here:
@@ -29,6 +30,17 @@ namespace ModelLibrary
             "remote", "keyboard", "cell phone", "microwave", "oven", "toaster", "sink", "refrigerator", 
             "book", "clock", "vase", "scissors", "teddy bear", "hair drier", "toothbrush" };
 
+        public static BufferBlock<string> bufferBlock = new BufferBlock<string>();
+
+        /*
+        private static async Task Consumer()
+        {
+            while (true)
+            {
+                Console.WriteLine(await bufferBlock.ReceiveAsync());
+            }
+        }
+        */
 
         public static async Task DetectImage(string imageFolder)
         {
@@ -100,7 +112,7 @@ namespace ModelLibrary
             */
 
             // 3 action blocks
-            var bitmapBlock = new TransformBlock<string, Bitmap>(image =>
+            var bitmapBlock = new TransformBlock<string, Bitmap>(async image =>
             {
                 var bitmap = new Bitmap(Image.FromFile(Path.Combine(image)));
                 return bitmap;
@@ -110,10 +122,10 @@ namespace ModelLibrary
                 MaxDegreeOfParallelism = Environment.ProcessorCount
             });
 
-            var predictBlock = new TransformBlock<Bitmap, YoloV4Prediction>(bitmap =>
+            var predictBlock = new TransformBlock<Bitmap, YoloV4Prediction>(async bitmap =>
             {
                 YoloV4Prediction predict = predictionEngine.Predict(new YoloV4BitmapData() { Image = bitmap });
-                processedImages.Add(bitmap);
+                await bufferBlock.SendAsync(processedImages.Add(bitmap));
                 return predict;
             },
             new ExecutionDataflowBlockOptions
@@ -121,7 +133,7 @@ namespace ModelLibrary
                 MaxDegreeOfParallelism = 1,
             });
 
-            var resultBlock = new ActionBlock<YoloV4Prediction>(predict =>
+            var resultBlock = new ActionBlock<YoloV4Prediction>(async predict =>
             {
                 var results = predict.GetResults(classesNames, 0.3f, 0.7f);
                 foreach (var res in results)
@@ -131,7 +143,9 @@ namespace ModelLibrary
                     var y1 = res.BBox[1];
                     var x2 = res.BBox[2];
                     var y2 = res.BBox[3];
-                    Console.WriteLine($"[left,top,right,bottom]:[{x1}, {y1}, {x2}, {y2}] object {res.Label}");
+                    await bufferBlock.SendAsync($"[left,top,right,bottom]:[{x1}, {y1}, {x2}, {y2}] object {res.Label}");
+                    //await bufferBlock.SendAsync(detectedObjects.Percent());
+                    //Console.WriteLine($"[left,top,right,bottom]:[{x1}, {y1}, {x2}, {y2}] object {res.Label}");
                 }
             },
             new ExecutionDataflowBlockOptions
@@ -147,9 +161,9 @@ namespace ModelLibrary
             bitmapBlock.Complete();
             await resultBlock.Completion;
             sw.Stop();
-            
-            
-            Console.WriteLine($"Done in {sw.ElapsedMilliseconds}ms.");
+
+            //Console.WriteLine($"Done in {sw.ElapsedMilliseconds}ms.");
+            /*
             Console.WriteLine("List of finding objects: ");
             foreach (var obj in detectedObjects)
             {
@@ -160,7 +174,9 @@ namespace ModelLibrary
                 Console.WriteLine($"[left,top,right,bottom]:[{x1}, {y1}, {x2}, {y2}] object {obj.Label}");
             }
             Console.WriteLine($"Total number of objects: {detectedObjects.Count}");
-            
+            */
+            await Detector.bufferBlock.SendAsync($"Total number of objects: {detectedObjects.Count}");
+            await Detector.bufferBlock.SendAsync("end");
         }
     }
 }
