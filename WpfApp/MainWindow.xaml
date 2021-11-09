@@ -19,5 +19,9 @@
                 Click="btnRun_Click"
                 HorizontalAlignment="Left" Height="75" Margin="505,124,0,0" 
                 VerticalAlignment="Top" Width="135"/>
+        
+        <ListBox x:Name="listBox_types" 
+                 ItemsSource="{Binding}"
+                 Margin="25,84,485,130"/>
     </Grid>
 </Window>

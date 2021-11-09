@@ -32,6 +32,8 @@ namespace ModelLibrary
 
         public static BufferBlock<string> bufferBlock = new BufferBlock<string>();
 
+        public static BufferBlock<string> resultBufferBlock = new BufferBlock<string>();
+
         /*
         private static async Task Consumer()
         {
@@ -41,6 +43,7 @@ namespace ModelLibrary
             }
         }
         */
+        //Dictionary<string, ConcurrentBag<string>> recognizedObjects = new Dictionary<string, ConcurrentBag<string>>();
 
         public static async Task DetectImage(string imageFolder)
         {
@@ -81,24 +84,33 @@ namespace ModelLibrary
             ConcurrentBag<YoloV4Result> detectedObjects = new ConcurrentBag<YoloV4Result>();
             string[] imageNames = Directory.GetFiles(imageFolder);
             ProcessedImages processedImages = new ProcessedImages(imageNames.Length);
-            //object locker = new object();
+
+            Dictionary<string, ConcurrentBag<string>> recognizedObjects = new Dictionary<string, ConcurrentBag<string>>();
+
+            foreach (string name in classesNames) {
+                recognizedObjects.Add(name, new ConcurrentBag<string>());
+            }
+
+            object locker = new object();
 
             var sw = new Stopwatch();
             sw.Start();
-            /*
+            
             var ab = new ActionBlock<string>(async image => {
                 YoloV4Prediction predict;
                 lock (locker)
                 {
                     var bitmap = new Bitmap(Image.FromFile(Path.Combine(image)));
                     predict = predictionEngine.Predict(new YoloV4BitmapData() { Image = bitmap });
-                    processedImages.Add(image);
+                    //processedImages.Add(image);
                 }
 
                 var results = predict.GetResults(classesNames, 0.3f, 0.7f);
                 foreach (var res in results)
                 {
-                    detectedObjects.Add(res); 
+                    recognizedObjects[res.Label].Add(image);
+
+                    await resultBufferBlock.SendAsync(res.Label);
                 }
             },
             new ExecutionDataflowBlockOptions
@@ -109,9 +121,10 @@ namespace ModelLibrary
             Parallel.For(0, imageNames.Length, i => ab.Post(imageNames[i]));
             ab.Complete();
             await ab.Completion;
-            */
+            
 
             // 3 action blocks
+            /*
             var bitmapBlock = new TransformBlock<string, Bitmap>(async image =>
             {
                 var bitmap = new Bitmap(Image.FromFile(Path.Combine(image)));
@@ -160,6 +173,7 @@ namespace ModelLibrary
             Parallel.For(0, imageNames.Length, i => bitmapBlock.Post(imageNames[i]));
             bitmapBlock.Complete();
             await resultBlock.Completion;
+            */
             sw.Stop();
 
             //Console.WriteLine($"Done in {sw.ElapsedMilliseconds}ms.");
@@ -177,6 +191,11 @@ namespace ModelLibrary
             */
             await Detector.bufferBlock.SendAsync($"Total number of objects: {detectedObjects.Count}");
             await Detector.bufferBlock.SendAsync("end");
+
+            foreach (KeyValuePair<string, ConcurrentBag<string>> pairs in recognizedObjects)
+            {
+                Console.WriteLine(pairs.Key + ": " + pairs.Value.ToString());
+            }
         }
     }
 }

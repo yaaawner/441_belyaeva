@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,21 +25,37 @@ namespace WpfApp
     public partial class MainWindow : Window
     {
         //string ImageFolder;
+
+        public static ObservableCollection<string> Types = new ObservableCollection<string>();
+
+        /*
+        public MainWindow()
+        {
+            this.InitializeComponents();
+            this.DataContext = this;
+            this.MyCollection = new ObservableCollection<MyObject>();
+        }
+        */
+
         private static async Task Consumer()
         {
-            string print;
+            string type;
+            string[] images;
+
             while (true)
             {
-                print = await Detector.bufferBlock.ReceiveAsync();
-                if (print == "end")
-                    break;
-                Console.WriteLine(print);
+                type = await Detector.resultBufferBlock.ReceiveAsync();
+                Types.Add(type);
+                //Console.WriteLine(type + images.ToString());
+                //listBox_types.
             }
         }
 
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = Types;
+            //Types = new List<string>();
             //ImageFolder = TextBox_Path.Text;
         }
 
@@ -56,13 +73,16 @@ namespace WpfApp
 
         private async void btnRun_Click(object sender, RoutedEventArgs e)
         {
-            
+
             //await Task.WhenAll(Detector.DetectImage(TextBox_Path.Text), Consumer());
             //btnRun.IsEnabled = false;
+            /*
             var task = Task.Run(async () =>
             {
                 await Detector.DetectImage(TextBox_Path.Text);
             });
+            */
+            await Task.WhenAll(Detector.DetectImage(TextBox_Path.Text), Consumer());
 
             /*
             await task.ContinueWith((t) =>
