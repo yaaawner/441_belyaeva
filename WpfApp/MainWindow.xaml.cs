@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Windows;
@@ -93,7 +94,7 @@ namespace WpfApp
     {
         //string ImageFolder;
 
-        public static ObservableCollection<Results> Types = new ObservableCollection<Results>();
+        public static ObservableCollection<Results> resultCollection = new ObservableCollection<Results>();
 
         //static ResultCollection resultCollection = new ResultCollection();
 
@@ -119,7 +120,7 @@ namespace WpfApp
                 //listBox_types.
 
                 bool flag = true;
-                foreach (Results r in Types)
+                foreach (Results r in resultCollection)
                 {
                     if (r.Info == type)
                     {
@@ -131,7 +132,7 @@ namespace WpfApp
                 }
                 if (flag)
                 {
-                    Types.Add(new Results(type, image));
+                    resultCollection.Add(new Results(type, image));
                 }
             }
         }
@@ -139,7 +140,7 @@ namespace WpfApp
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = Types;
+            DataContext = resultCollection;
             //Types = new List<string>();
             //ImageFolder = TextBox_Path.Text;
         }
@@ -166,6 +167,10 @@ namespace WpfApp
                 await Detector.DetectImage(TextBox_Path.Text);
             });
             */
+
+            resultCollection.Clear();
+            Detector.cancelTokenSource = new CancellationTokenSource();
+            Detector.token = Detector.cancelTokenSource.Token;
             await Task.WhenAll(Detector.DetectImage(TextBox_Path.Text), Consumer());
 
             /*
@@ -177,6 +182,11 @@ namespace WpfApp
                  });
             });
             */
+        }
+
+        private void btnCancel_Click(object sender, RoutedEventArgs e)
+        {
+            Detector.cancelTokenSource.Cancel();
         }
     }
 }

@@ -9,6 +9,7 @@ using static Microsoft.ML.Transforms.Image.ImageResizingEstimator;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Collections.Concurrent;
+using System.Threading;
 
 namespace ModelLibrary
 {
@@ -33,6 +34,9 @@ namespace ModelLibrary
         public static BufferBlock<string> bufferBlock = new BufferBlock<string>();
 
         public static BufferBlock<(string, string)> resultBufferBlock = new BufferBlock<(string, string)>();
+
+        public static CancellationTokenSource cancelTokenSource;
+        public static CancellationToken token;
 
         /*
         private static async Task Consumer()
@@ -109,13 +113,16 @@ namespace ModelLibrary
                 foreach (var res in results)
                 {
                     recognizedObjects[res.Label].Add(image);
-
-                    await resultBufferBlock.SendAsync((res.Label, image));
+                    if (!token.IsCancellationRequested)
+                    {
+                        await resultBufferBlock.SendAsync((res.Label, image));
+                    }
                 }
             },
             new ExecutionDataflowBlockOptions
             {
-                MaxDegreeOfParallelism = Environment.ProcessorCount
+                MaxDegreeOfParallelism = Environment.ProcessorCount,
+                CancellationToken = token
             });
 
             Parallel.For(0, imageNames.Length, i => ab.Post(imageNames[i]));
