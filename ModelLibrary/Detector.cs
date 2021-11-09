@@ -32,7 +32,7 @@ namespace ModelLibrary
 
         public static BufferBlock<string> bufferBlock = new BufferBlock<string>();
 
-        public static BufferBlock<string> resultBufferBlock = new BufferBlock<string>();
+        public static BufferBlock<(string, string)> resultBufferBlock = new BufferBlock<(string, string)>();
 
         /*
         private static async Task Consumer()
@@ -110,7 +110,7 @@ namespace ModelLibrary
                 {
                     recognizedObjects[res.Label].Add(image);
 
-                    await resultBufferBlock.SendAsync(res.Label);
+                    await resultBufferBlock.SendAsync((res.Label, image));
                 }
             },
             new ExecutionDataflowBlockOptions
