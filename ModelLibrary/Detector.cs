@@ -128,6 +128,10 @@ namespace ModelLibrary
             Parallel.For(0, imageNames.Length, i => ab.Post(imageNames[i]));
             ab.Complete();
             await ab.Completion;
+
+            //string end = "end";
+
+            await resultBufferBlock.SendAsync(("end", "end"));
             
 
             // 3 action blocks
