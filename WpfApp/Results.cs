@@ -5,6 +5,7 @@ using System.Text;
 
 namespace WpfApp
 {
+    /*
     abstract public class Type
     {
         public string Info { get; set; }
@@ -14,13 +15,14 @@ namespace WpfApp
             Info = info;
         }
     }
+    */
 
-    public class Results : Type, IEnumerable<string>
+    public class Results : IEnumerable<string>
     {
-        //public string type { get; set; }
+        public string Info { get; set; }
         public List<string> images { get; set; }
 
-        public Results(string newType, string newImage) : base(newType)
+        public Results(string newType, string newImage) 
         {
             Info = newType;
             images = new List<string>();

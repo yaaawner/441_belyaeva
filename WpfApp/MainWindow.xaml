@@ -30,7 +30,7 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
-                        <TextBlock Text="{Binding .}"/>
+                        <TextBlock Text="{Binding Path=Info}"/>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
