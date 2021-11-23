@@ -31,7 +31,8 @@ namespace ModelLibrary
             "book", "clock", "vase", "scissors", "teddy bear", "hair drier", "toothbrush" };
 
         public static BufferBlock<string> bufferBlock = new BufferBlock<string>();
-        public static BufferBlock<(string, string)> resultBufferBlock = new BufferBlock<(string, string)>();
+        public static BufferBlock<(string, string, Bitmap)> resultBufferBlock =
+            new BufferBlock<(string, string, Bitmap)>();
         public static CancellationTokenSource cancelTokenSource;
         public static CancellationToken token;
 
@@ -85,7 +86,9 @@ namespace ModelLibrary
 
             var sw = new Stopwatch();
             sw.Start();
-            
+
+            string imageOutputFolder = @"D:\models\Assets\Output";
+
             var ab = new ActionBlock<string>(async image => {
                 YoloV4Prediction predict;
                 lock (locker)
@@ -94,15 +97,64 @@ namespace ModelLibrary
                     predict = predictionEngine.Predict(new YoloV4BitmapData() { Image = bitmap });
                 }
 
+                //using (var g = Graphics.FromImage(new Bitmap(Image.FromFile(Path.Combine(image)))))
                 var results = predict.GetResults(classesNames, 0.3f, 0.7f);
+                int i = 0; 
                 foreach (var res in results)
                 {
                     recognizedObjects[res.Label].Add(image);
+                    var x1 = res.BBox[0];
+                    var y1 = res.BBox[1];
+                    var x2 = res.BBox[2];
+                    var y2 = res.BBox[3];
+
+                    //Console.WriteLine(x1.ToString());
+
+                    Rectangle cropRect = new Rectangle((int)x1, (int)y1, (int)(x2 - x1), (int)(y2 - y1));
+                    Bitmap src = Image.FromFile(image) as Bitmap;
+                    Bitmap target = new Bitmap(cropRect.Width, cropRect.Height);
+
+                    using (Graphics g = Graphics.FromImage(target))
+                    {
+                        g.DrawImage(src, new Rectangle(0, 0, target.Width, target.Height),
+                                         cropRect,
+                                         GraphicsUnit.Pixel);
+                    }
+
                     if (!token.IsCancellationRequested)
                     {
-                        await resultBufferBlock.SendAsync((res.Label, image));
+                        await resultBufferBlock.SendAsync((res.Label, image, target));
                     }
+                    
+
+                    //target.
+                    //target.Save(Path.Combine(imageOutputFolder, Path.ChangeExtension(image, "_processed" + x1.ToString() + y1.ToString() + Path.GetExtension(image))));
+                    //target.Save(imageOutputFolder + "/" + res.Label + x1.ToString() + y2.ToString() + i.ToString() + ".jpg");
                 }
+
+
+                /*
+                 using (var g = Graphics.FromImage(bitmap))
+                    {
+                        foreach (var res in results)
+                        {
+                            // draw predictions
+                            var x1 = res.BBox[0];
+                            var y1 = res.BBox[1];
+                            var x2 = res.BBox[2];
+                            var y2 = res.BBox[3];
+                            g.DrawRectangle(Pens.Red, x1, y1, x2 - x1, y2 - y1);
+                            using (var brushes = new SolidBrush(Color.FromArgb(50, Color.Red)))
+                            {
+                                g.FillRectangle(brushes, x1, y1, x2 - x1, y2 - y1);
+                            }
+
+                            g.DrawString(res.Label + " " + res.Confidence.ToString("0.00"),
+                                         new Font("Arial", 12), Brushes.Blue, new PointF(x1, y1));
+                        }
+                        bitmap.Save(Path.Combine(imageOutputFolder, Path.ChangeExtension(imageName, "_processed" + Path.GetExtension(imageName))));
+                    }
+                 */
             },
             new ExecutionDataflowBlockOptions
             {
@@ -115,7 +167,7 @@ namespace ModelLibrary
             await ab.Completion;
             sw.Stop();
 
-            await resultBufferBlock.SendAsync(("end", "end"));
+            await resultBufferBlock.SendAsync(("end", "end", null));
             await Detector.bufferBlock.SendAsync($"Total number of objects: {detectedObjects.Count}");
             await Detector.bufferBlock.SendAsync("end");
         }

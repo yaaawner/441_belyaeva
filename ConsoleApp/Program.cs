@@ -4,6 +4,14 @@ using System.Threading.Tasks.Dataflow;
 using ModelLibrary;
 using System.Collections.Generic;
 using System.Data.Entity;
+using Microsoft.ML;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using YOLOv4MLNet.DataStructures;
+using static Microsoft.ML.Transforms.Image.ImageResizingEstimator;
+using System.Collections.Concurrent;
+using System.Threading;
 
 namespace ConsoleApp
 {
@@ -12,6 +20,11 @@ namespace ConsoleApp
         public int Id { get; set; }
         public string Type { get; set; }
         public string Path { get; set; }
+        //public float x1 { get; set; }
+        //public float y1 { get; set; }
+        //public float x2 { get; set; }
+        //public float y2 { get; set; }
+        public byte[] BitmapImage { get; set; }
     }
 
     class UserContext : DbContext
@@ -23,22 +36,31 @@ namespace ConsoleApp
 
     class Program
     {
+        public static byte[] ImageToByte2(Image img)
+        {
+            using (var stream = new MemoryStream())
+            {
+                img.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                return stream.ToArray();
+            }
+        }
         private static async Task Consumer()
         {
             string type;
             string image;
+            Bitmap bitmap;
 
             using (UserContext db = new UserContext())
             {
                 while (true)
                 {
-                    (type, image) = await Detector.resultBufferBlock.ReceiveAsync();
+                    (type, image, bitmap) = await Detector.resultBufferBlock.ReceiveAsync();
                     if (type == "end")
                     {
                         db.SaveChanges();
                         break;
                     }
-                    DetectedObject result = new DetectedObject { Type = type, Path = image };
+                    DetectedObject result = new DetectedObject { Type = type, Path = image, BitmapImage = ImageToByte2(bitmap)};
                     db.DetectedObjects.Add(result);
                 }
 
