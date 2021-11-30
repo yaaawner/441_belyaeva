@@ -16,12 +16,14 @@ using System.Linq;
 
 namespace ConsoleApp3
 {
+    /*
     [Keyless]
     public class DetectedObjectDetails
     {
         public int DetectedObjectDetailsId { get; set; }
         public byte[] BitmapImage { get; set; }
     }
+    */
 
     public class DetectedObject
     {
@@ -32,22 +34,24 @@ namespace ConsoleApp3
         public float x2 { get; set; }
         public float y2 { get; set; }
         //public byte[] BitmapImage { get; set; }
-        public int DetectedObjectDetailsId { get; set; }
-        virtual public DetectedObjectDetails Details { get; set; }
+        //public int DetectedObjectDetailsId { get; set; }
+        //virtual public DetectedObjectDetails Details { get; set; }
+        public byte[] BitmapImage { get; set; }
+
     }
 
     public class Results
     {
         public int ResultsId { get; set; }
         public string Type { get; set; }
-        virtual public ICollection<DetectedObject> DetectedObjects { get; set; }
+        public ICollection<DetectedObject> DetectedObjects { get; set; }
     }
 
     class UserContext : DbContext
     {
         public DbSet<Results> Results { get; set; }
         public DbSet<DetectedObject> DetectedObject { get; set; }
-        public DbSet<DetectedObjectDetails> DetectedObjectDetails { get; set; }
+        //public DbSet<DetectedObjectDetails> DetectedObjectDetails { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder o)
            => o.UseSqlite("Data Source=MLResults.db");
     }
@@ -79,18 +83,21 @@ namespace ConsoleApp3
                         break;
                     }
                     Results result = new Results { Type = type };
+                    result.DetectedObjects = new List<DetectedObject>();
                     DetectedObject objects = new DetectedObject
                     {
                         Path = image,
                         x1 = BBox[0],
                         y1 = BBox[1],
                         x2 = BBox[2],
-                        y2 = BBox[3]
+                        y2 = BBox[3],
+                        BitmapImage = ImageToByte2(bitmap)
                     };
-                    DetectedObjectDetails details = new DetectedObjectDetails { BitmapImage = ImageToByte2(bitmap) };
-                    objects.Details = details;
-                    db.DetectedObjectDetails.Add(details);
-                    db.DetectedObject.Add(objects);
+                    result.DetectedObjects.Add(objects);
+                    //DetectedObjectDetails details = new DetectedObjectDetails { BitmapImage = ImageToByte2(bitmap) };
+                    //objects.Details = details;
+                    //db.DetectedObjectDetails.Add(details);
+                    //db.DetectedObject.Add(objects);
                     db.Results.Add(result);
                     
                     db.SaveChanges();
