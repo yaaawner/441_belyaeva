@@ -31,8 +31,8 @@ namespace ModelLibrary
             "book", "clock", "vase", "scissors", "teddy bear", "hair drier", "toothbrush" };
 
         public static BufferBlock<string> bufferBlock = new BufferBlock<string>();
-        public static BufferBlock<(string, string, Bitmap)> resultBufferBlock =
-            new BufferBlock<(string, string, Bitmap)>();
+        public static BufferBlock<(string, string, Bitmap, float[])> resultBufferBlock =
+            new BufferBlock<(string, string, Bitmap, float[])>();
         public static CancellationTokenSource cancelTokenSource;
         public static CancellationToken token;
 
@@ -123,7 +123,7 @@ namespace ModelLibrary
 
                     if (!token.IsCancellationRequested)
                     {
-                        await resultBufferBlock.SendAsync((res.Label, image, target));
+                        await resultBufferBlock.SendAsync((res.Label, image, target, res.BBox));
                     }
                     
 
@@ -167,7 +167,7 @@ namespace ModelLibrary
             await ab.Completion;
             sw.Stop();
 
-            await resultBufferBlock.SendAsync(("end", "end", null));
+            await resultBufferBlock.SendAsync(("end", "end", null, null));
             await Detector.bufferBlock.SendAsync($"Total number of objects: {detectedObjects.Count}");
             await Detector.bufferBlock.SendAsync("end");
         }

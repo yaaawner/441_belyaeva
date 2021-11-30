@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace ConsoleApp
+namespace ConsoleApp1
 {
     public class DetectedObject
     {
@@ -66,7 +66,7 @@ namespace ConsoleApp
                         db.SaveChanges();
                         break;
                     }
-                    DetectedObject result = new DetectedObject { Type = type, Path = image, BitmapImage = ImageToByte2(bitmap)};
+                    DetectedObject result = new DetectedObject { Type = type, Path = image, BitmapImage = ImageToByte2(bitmap) };
                     db.DetectedObjects.Add(result);
                 }
 
