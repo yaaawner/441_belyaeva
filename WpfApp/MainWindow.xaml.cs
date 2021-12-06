@@ -18,6 +18,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ModelLibrary;
 using Ookii.Dialogs.Wpf;
+using Microsoft.EntityFrameworkCore;
+//using System.Linq;
+using System.Drawing;
 
 namespace WpfApp
 {
@@ -26,37 +29,33 @@ namespace WpfApp
     /// </summary>
     /// 
 
+
     public partial class MainWindow : Window
     {
-        public static ObservableCollection<Results> resultCollection = new ObservableCollection<Results>();
+        public static ResultContext db = new ResultContext();
+        //public static ObservableCollection<Results> resultCollection = new ObservableCollection<Results>();
+        public static ObservableCollection<Results> resultCollection = db.Results.Local.ToObservableCollection();
 
         private static async Task Consumer()
         {
-            string type;
-            string image;
-
             while (true)
             {
-                (type, image) = await Detector.resultBufferBlock.ReceiveAsync();
+                string type;
+                string image;
+                Bitmap bitmap;
+                float[] BBox;
+
+                (type, image, bitmap, BBox) = await Detector.resultBufferBlock.ReceiveAsync();
                 if (type == "end")
                 {
+                    db.SaveChanges();
                     break;
                 }
-                    
-                bool flag = true;
-                foreach (Results r in resultCollection)
+                else
                 {
-                    if (r.Info == type)
-                    {
-                        r.images.Add(image);
-                        flag = false;
-                        break;
-                    }
+                    db.AddElem(type, image, BBox, bitmap);
                 }
-                if (flag)
-                {
-                    resultCollection.Add(new Results(type, image));
-                }
+
             }
         }
 
@@ -64,6 +63,7 @@ namespace WpfApp
         {
             InitializeComponent();
             DataContext = resultCollection;
+            //DataContext = db.Results;
         }
 
         private void btnSelect_Click(object sender, RoutedEventArgs e)
@@ -76,18 +76,29 @@ namespace WpfApp
         private async void btnRun_Click(object sender, RoutedEventArgs e)
         {
             btnRun.IsEnabled = false;
-            resultCollection.Clear();
+            //resultCollection.Clear();
+            db.Clear();
             Detector.cancelTokenSource = new CancellationTokenSource();
             Detector.token = Detector.cancelTokenSource.Token;
 
             await Task.WhenAll(Detector.DetectImage(TextBox_Path.Text), Consumer());
-            btnRun.IsEnabled = true;   
+            btnRun.IsEnabled = true;
         }
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
             Detector.cancelTokenSource.Cancel();
             btnRun.IsEnabled = true;
+        }
+
+        private void listBox_types_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void btnDelete_Click(object sender, RoutedEventArgs e)
+        {
+            db.DeleteType(listBox_types.SelectedItem.ToString());
         }
     }
 }

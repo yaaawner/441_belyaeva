@@ -8,10 +8,19 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ModelLibrary\ModelLibrary.csproj" />
+    
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Ookii.Dialogs.Wpf" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0-rc.2.20475.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.0-rc.2.20475.6">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.0-rc.2.20475.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.0-rc.2.20475.6" />
   </ItemGroup>
 
 </Project>

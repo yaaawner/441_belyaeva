@@ -120,16 +120,19 @@ namespace ModelLibrary
                                          cropRect,
                                          GraphicsUnit.Pixel);
                     }
+                    string imageOutputPath = imageOutputFolder + "/" + res.Label + x1.ToString() 
+                                           + y2.ToString() + i.ToString() + ".jpg";
+                    target.Save(imageOutputPath);
 
                     if (!token.IsCancellationRequested)
                     {
-                        await resultBufferBlock.SendAsync((res.Label, image, target, res.BBox));
+                        await resultBufferBlock.SendAsync((res.Label, imageOutputPath, target, res.BBox));
                     }
                     
 
                     //target.
                     //target.Save(Path.Combine(imageOutputFolder, Path.ChangeExtension(image, "_processed" + x1.ToString() + y1.ToString() + Path.GetExtension(image))));
-                    //target.Save(imageOutputFolder + "/" + res.Label + x1.ToString() + y2.ToString() + i.ToString() + ".jpg");
+                    
                 }
 
 

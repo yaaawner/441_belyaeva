@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -22,6 +22,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ModelLibrary\ModelLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="MLResults.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

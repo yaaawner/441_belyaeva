@@ -5,12 +5,13 @@ using System.Text;
 
 namespace WpfApp
 {
-    public class Results : IEnumerable<string>
+    
+    public class ResultsView : IEnumerable<string>
     {
         public string Info { get; set; }
         public List<string> images { get; set; }
 
-        public Results(string newType, string newImage) 
+        public ResultsView(string newType, string newImage) 
         {
             Info = newType;
             images = new List<string>();
@@ -32,4 +33,5 @@ namespace WpfApp
             return ((IEnumerable)images).GetEnumerator();
         }
     }
+    
 }

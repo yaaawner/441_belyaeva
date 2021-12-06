@@ -6,18 +6,18 @@
         xmlns:local="clr-namespace:WpfApp"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    
+
     <Grid>
         <TextBox x:Name ="TextBox_Path" 
                  Text="D:\models\Assets\Images"
                  HorizontalAlignment="Left" Margin="25,26,0,0"
                  TextWrapping="Wrap" VerticalAlignment="Top" Width="290" Height="18"/>
-        
+
         <Button x:Name="btnSelect" Content="Select folder" 
                 Click="btnSelect_Click"
                 HorizontalAlignment="Left" Height="18" Margin="350,26,0,0" 
                 VerticalAlignment="Top" Width="85"/>
-        
+
         <Button x:Name="btnRun" Content="Run" 
                 Click="btnRun_Click"
                 HorizontalAlignment="Left" Height="20" Margin="460,26,0,0" 
@@ -28,25 +28,28 @@
                 HorizontalAlignment="Left" Margin="585,26,0,0" VerticalAlignment="Top" 
                 RenderTransformOrigin="0.631,0.754" Width="75"/>
 
-        <ListBox x:Name="listBox_types"  ItemsSource="{Binding}" Margin="25,84,630,45">
+        <Button x:Name="btnDelete" Content="Delete Type" HorizontalAlignment="Left" Margin="700,26,0,0" VerticalAlignment="Top" Click="btnDelete_Click" />
+
+        <ListBox x:Name="listBox_types"  ItemsSource="{Binding}" Margin="25,84,630,45" SelectionChanged="listBox_types_SelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
-                        <TextBlock Text="{Binding Path=Info}"/>
+                        <TextBlock Text="{Binding Path=Type}"/>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        
-        <ListBox Margin="200,84,30,45" ItemsSource="{Binding ElementName=listBox_types, Path=SelectedItem}">
+
+        <ListBox Margin="200,84,30,45" ItemsSource="{Binding ElementName=listBox_types, Path=SelectedItem.DetectedObjects}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
-                        <Image Source="{Binding .}" Width="400"/>
+                        <Image Source="{Binding Path=OutputPath}" Height="100"/>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-     
+       
+
     </Grid>
 </Window>

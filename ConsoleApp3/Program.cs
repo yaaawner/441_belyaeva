@@ -16,55 +16,8 @@ using System.Linq;
 
 namespace ConsoleApp3
 {
-    /*
-    [Keyless]
-    public class DetectedObjectDetails
-    {
-        public int DetectedObjectDetailsId { get; set; }
-        public byte[] BitmapImage { get; set; }
-    }
-    */
-
-    public class DetectedObject
-    {
-        public int DetectedObjectId { get; set; }
-        public string Path { get; set; }
-        public float x1 { get; set; }
-        public float y1 { get; set; }
-        public float x2 { get; set; }
-        public float y2 { get; set; }
-        //public byte[] BitmapImage { get; set; }
-        //public int DetectedObjectDetailsId { get; set; }
-        //virtual public DetectedObjectDetails Details { get; set; }
-        public byte[] BitmapImage { get; set; }
-
-    }
-
-    public class Results
-    {
-        public int ResultsId { get; set; }
-        public string Type { get; set; }
-        public ICollection<DetectedObject> DetectedObjects { get; set; }
-    }
-
-    class UserContext : DbContext
-    {
-        public DbSet<Results> Results { get; set; }
-        public DbSet<DetectedObject> DetectedObject { get; set; }
-        //public DbSet<DetectedObjectDetails> DetectedObjectDetails { get; set; }
-        protected override void OnConfiguring(DbContextOptionsBuilder o)
-           => o.UseSqlite("Data Source=MLResults.db");
-    }
     class Program
     {
-        public static byte[] ImageToByte2(Image img)
-        {
-            using (var stream = new MemoryStream())
-            {
-                img.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                return stream.ToArray();
-            }
-        }
         private static async Task Consumer()
         {
             string type;
@@ -72,7 +25,7 @@ namespace ConsoleApp3
             Bitmap bitmap;
             float[] BBox;
 
-            using (UserContext db = new UserContext())
+            using (ResultContext db = new ResultContext())
             {
                 while (true)
                 {
@@ -82,24 +35,59 @@ namespace ConsoleApp3
                         db.SaveChanges();
                         break;
                     }
-                    Results result = new Results { Type = type };
-                    result.DetectedObjects = new List<DetectedObject>();
-                    DetectedObject objects = new DetectedObject
+
+                    bool flag = true;
+                    foreach (var res in db.Results)
                     {
-                        Path = image,
-                        x1 = BBox[0],
-                        y1 = BBox[1],
-                        x2 = BBox[2],
-                        y2 = BBox[3],
-                        BitmapImage = ImageToByte2(bitmap)
-                    };
-                    result.DetectedObjects.Add(objects);
-                    //DetectedObjectDetails details = new DetectedObjectDetails { BitmapImage = ImageToByte2(bitmap) };
-                    //objects.Details = details;
-                    //db.DetectedObjectDetails.Add(details);
-                    //db.DetectedObject.Add(objects);
-                    db.Results.Add(result);
-                    
+                        if (res.Type == type)
+                        {
+                            bool flagimg = true;
+                            foreach(var obj in res.DetectedObjects)
+                            {
+                                if (obj.x1 == BBox[0] && obj.y1 == BBox[1] && obj.x2 == BBox[2] && obj.y2 == BBox[3])
+                                {
+                                    if (obj.BitmapImage == ImageToByte2(bitmap))
+                                    {
+                                        flagimg = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (flagimg)
+                            {
+                                res.DetectedObjects.Add(new DetectedObject
+                                {
+                                    Path = image,
+                                    x1 = BBox[0],
+                                    y1 = BBox[1],
+                                    x2 = BBox[2],
+                                    y2 = BBox[3],
+                                    BitmapImage = ImageToByte2(bitmap)
+                                });
+                            }
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if (flag)
+                    {
+                        Results result = new Results { Type = type };
+                        result.DetectedObjects = new List<DetectedObject>();
+                        DetectedObject objects = new DetectedObject
+                        {
+                            Path = image,
+                            x1 = BBox[0],
+                            y1 = BBox[1],
+                            x2 = BBox[2],
+                            y2 = BBox[3],
+                            BitmapImage = ImageToByte2(bitmap)
+                        };
+                        result.DetectedObjects.Add(objects);
+                        db.Results.Add(result);
+                        //db.Results
+
+                    }
+
                     db.SaveChanges();
                 }
                 foreach (var res in db.Results.Include(a => a.DetectedObjects))
@@ -108,6 +96,12 @@ namespace ConsoleApp3
                     // db.Entry(a2).Collection(a => a.Books).Load();
                     foreach (var d in res.DetectedObjects)
                         Console.WriteLine($"       {d.DetectedObjectId} {d.Path}");
+                }
+                
+                // Clear
+                foreach (var res in db.Results)
+                {
+                    db.Results.Remove(res);
                 }
 
             }
