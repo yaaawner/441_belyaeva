@@ -134,7 +134,7 @@ namespace Server
             SaveChanges();
         } 
 
-        
+        /*
         public IEnumerable<string> GetObjects (string type)
         {
             //var query = Results.Where()
@@ -150,7 +150,7 @@ namespace Server
                 }
             }
         }
-        
+        */
         
 
 

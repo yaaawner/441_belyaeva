@@ -20,6 +20,8 @@ using Ookii.Dialogs.Wpf;
 using Microsoft.EntityFrameworkCore;
 //using System.Linq;
 using System.Drawing;
+using System.Net.Http;
+using Newtonsoft.Json;
 
 namespace WpfApp
 {
@@ -32,11 +34,13 @@ namespace WpfApp
     public partial class MainWindow : Window
     {
         //public static ResultContext db = new ResultContext();
-        public static ObservableCollection<Results> resultCollection = new ObservableCollection<Results>();
+        public static HttpClient client = new HttpClient();
+        public static ObservableCollection<string> resultCollection = new ObservableCollection<string>();
         //public static ObservableCollection<Results> resultCollection = db.Results.Local.ToObservableCollection();
 
         public MainWindow()
         {
+            
             InitializeComponent();
             DataContext = resultCollection;
             //DataContext = db.Results;
@@ -52,6 +56,11 @@ namespace WpfApp
         private async void btnRun_Click(object sender, RoutedEventArgs e)
         {
             btnRun.IsEnabled = false;
+            string result = await client.GetStringAsync("https://localhost:44394/results/types");
+            var allbooks = JsonConvert.DeserializeObject<IEnumerable<string>>(result);
+            foreach (var b in allbooks)
+                resultCollection.Add(b);
+                //Console.WriteLine($"{b.Title}");
             //resultCollection.Clear();
             //db.Clear();
             //Detector.cancelTokenSource = new CancellationTokenSource();

@@ -36,6 +36,7 @@ namespace Server.Controllers
 
         }
 
+        /*
         [HttpGet("{type}")]
         public IEnumerable<string> GetObjects(string type)
         {
@@ -44,7 +45,7 @@ namespace Server.Controllers
                 return db.GetObjects(type);
             }
         }
-        
+        */
 
     }
 

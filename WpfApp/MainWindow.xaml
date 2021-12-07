@@ -34,20 +34,14 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
-                        <TextBlock Text="{Binding Path=Type}"/>
+                        <TextBlock Text="{Binding .}"/>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <ListBox Margin="200,84,30,45" ItemsSource="{Binding ElementName=listBox_types, Path=SelectedItem.DetectedObjects}">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel>
-                        <Image Source="{Binding Path=OutputPath}" Height="100"/>
-                    </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
+        <ListBox Margin="200,84,30,45">
+            
         </ListBox>
        
 
