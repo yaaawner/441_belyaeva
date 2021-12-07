@@ -16,7 +16,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using ModelLibrary;
 using Ookii.Dialogs.Wpf;
 using Microsoft.EntityFrameworkCore;
 //using System.Linq;
@@ -32,32 +31,9 @@ namespace WpfApp
 
     public partial class MainWindow : Window
     {
-        public static ResultContext db = new ResultContext();
-        //public static ObservableCollection<Results> resultCollection = new ObservableCollection<Results>();
-        public static ObservableCollection<Results> resultCollection = db.Results.Local.ToObservableCollection();
-
-        private static async Task Consumer()
-        {
-            while (true)
-            {
-                string type;
-                string image;
-                Bitmap bitmap;
-                float[] BBox;
-
-                (type, image, bitmap, BBox) = await Detector.resultBufferBlock.ReceiveAsync();
-                if (type == "end")
-                {
-                    db.SaveChanges();
-                    break;
-                }
-                else
-                {
-                    db.AddElem(type, image, BBox, bitmap);
-                }
-
-            }
-        }
+        //public static ResultContext db = new ResultContext();
+        public static ObservableCollection<Results> resultCollection = new ObservableCollection<Results>();
+        //public static ObservableCollection<Results> resultCollection = db.Results.Local.ToObservableCollection();
 
         public MainWindow()
         {
@@ -77,17 +53,20 @@ namespace WpfApp
         {
             btnRun.IsEnabled = false;
             //resultCollection.Clear();
-            db.Clear();
-            Detector.cancelTokenSource = new CancellationTokenSource();
-            Detector.token = Detector.cancelTokenSource.Token;
+            //db.Clear();
+            //Detector.cancelTokenSource = new CancellationTokenSource();
+            //Detector.token = Detector.cancelTokenSource.Token;
 
-            await Task.WhenAll(Detector.DetectImage(TextBox_Path.Text), Consumer());
+            //await Task.WhenAll(Detector.DetectImage(TextBox_Path.Text), Consumer());
+            // запустить процесс разпознавания 
+            // отправляем путь, ответ все данные 
             btnRun.IsEnabled = true;
         }
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
-            Detector.cancelTokenSource.Cancel();
+            //Detector.cancelTokenSource.Cancel();
+            // запрос на отмену
             btnRun.IsEnabled = true;
         }
 
@@ -98,7 +77,8 @@ namespace WpfApp
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
-            db.DeleteType(listBox_types.SelectedItem.ToString());
+            //db.DeleteType(listBox_types.SelectedItem.ToString());
+            // запрос на удаление типа
         }
     }
 }

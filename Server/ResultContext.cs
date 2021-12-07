@@ -6,9 +6,17 @@ using System.Linq;
 using System.IO;
 using System.Drawing;
 using System.Collections;
+using ModelLibrary;
+using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
-namespace WpfApp
+namespace Server
 {
+    public class ResultsView
+    {
+
+    }
+
     public class DetectedObject
     {
         public int DetectedObjectId { get; set; }
@@ -32,35 +40,13 @@ namespace WpfApp
         public string Type { get; set; }
         public ICollection<DetectedObject> DetectedObjects { get; set; }
 
-        /*
-        public IEnumerator<string> GetEnumerator()
-        {
-            return ((IEnumerable<string>)DetectedObjects).GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable)DetectedObjects).GetEnumerator();
-        }
-        /*
-        public IEnumerator<DetectedObject> GetEnumerator()
-        {
-            //return ((IEnumerable<string>)images).GetEnumerator();
-            return DetectedObjects.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable)DetectedObjects).GetEnumerator();
-        }
-        */
-        
-
         public override string ToString()
         {
             return Type;
         }
     }
+
+    
     public class ResultContext : DbContext
     {
         //public UserContext() : base("DbConnection") { }
@@ -114,7 +100,6 @@ namespace WpfApp
             }
         }
 
-        
         public void Clear()
         {
             foreach (var dobj in DetectedObject)
@@ -149,7 +134,7 @@ namespace WpfApp
             SaveChanges();
         } 
 
-        /*
+        
         public IEnumerable<string> GetObjects (string type)
         {
             //var query = Results.Where()
@@ -159,15 +144,53 @@ namespace WpfApp
                 {
                     foreach (var dobj in res.DetectedObjects)
                     {
-
+                        yield return dobj.OutputPath;
                     }
+                    break;
                 }
             }
         }
-        */
+        
+        
 
 
 
         //public IEnumerable<>
+
+
     }
+
+    public class Sandbox
+    {
+        //public static ResultContext db = new ResultContext();
+        //public static ObservableCollection<Results> resultCollection = new ObservableCollection<Results>();
+        //public static ObservableCollection<Results> resultCollection = db.Results.Local.ToObservableCollection();
+
+        public static async Task Consumer()
+        {
+            var db = new ResultContext();
+            
+                while (true)
+                {
+                    string type;
+                    string image;
+                    Bitmap bitmap;
+                    float[] BBox;
+
+                    (type, image, bitmap, BBox) = await Detector.resultBufferBlock.ReceiveAsync();
+                    if (type == "end")
+                    {
+                        db.SaveChanges();
+                        break;
+                    }
+                    else
+                    {
+                        db.AddElem(type, image, BBox, bitmap);
+                    }
+
+                }
+            
+        }
+    }
+
 }
