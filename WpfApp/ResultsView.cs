@@ -8,19 +8,19 @@ namespace WpfApp
     
     public class ResultsView : IEnumerable<string>
     {
-        public string Info { get; set; }
+        public string Type { get; set; }
         public List<string> images { get; set; }
 
         public ResultsView(string newType, string newImage) 
         {
-            Info = newType;
+            Type = newType;
             images = new List<string>();
             images.Add(newImage);
         }
 
         public override string ToString()
         {
-            return Info;
+            return Type;
         }
 
         public IEnumerator<string> GetEnumerator()
