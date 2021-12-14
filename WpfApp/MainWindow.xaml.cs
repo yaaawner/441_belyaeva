@@ -97,7 +97,6 @@ namespace WpfApp
             {
                 MessageBox.Show(ex.Message, "Error");
             }
-            btnRun.IsEnabled = true;
         }
 
         private async void btnDelete_Click(object sender, RoutedEventArgs e)
