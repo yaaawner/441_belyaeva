@@ -28,8 +28,9 @@ namespace Server.Controllers
         }
 
         [HttpGet("types")]
-        public IEnumerable<string> GetTypes()
+        public async Task<IEnumerable<string>> GetTypes()
         {
+            await Task.WhenAll(Detector.DetectImage(imageFolder), Sandbox.Consumer());
             var db = new ResultContext();
             
                 return db.GetTypes();
@@ -43,6 +44,12 @@ namespace Server.Controllers
             //return type;
         }
 
+        [HttpDelete("types/{type}")]
+        public void DeleteType(string type)
+        {
+            var db = new ResultContext();
+            db.DeleteType(type);
+        }
         /*
         [HttpGet("{type}")]
         public IEnumerable<string> GetObjects(string type)

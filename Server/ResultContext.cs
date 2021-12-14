@@ -74,22 +74,27 @@ namespace Server
             if (query.Count() > 0)
             {
                 dobj.Type = query.First();
-            } 
+            }
             else
             {
-                Results results = new Results();
-                dobj.Type = results;
+                dobj.Type = new Results();
                 dobj.Type.Type = type;
                 Results.Add(dobj.Type);
             }
-            dobj.x1 = BBox[0];
-            dobj.y1 = BBox[1];
-            dobj.x2 = BBox[2];
-            dobj.y2 = BBox[3];
-            dobj.BitmapImage = ImageToByte2(bitmap);
-            dobj.Path = path;
-            dobj.OutputPath = path;
-            DetectedObject.Add(dobj);
+
+            var f = DetectedObject.Where(p => p.x1 == BBox[0] && p.y1 == BBox[1] && p.x2 == BBox[2] && p.y2 == BBox[3]
+                                         && p.Type.Type == type);
+
+            if (f.Count() == 0)
+            {
+                dobj.x1 = BBox[0];
+                dobj.y1 = BBox[1];
+                dobj.x2 = BBox[2];
+                dobj.y2 = BBox[3];
+                dobj.BitmapImage = ImageToByte2(bitmap);
+                DetectedObject.Add(dobj);
+            }
+
             SaveChanges();
         }
 
@@ -125,6 +130,7 @@ namespace Server
 
         public void DeleteType(string type)
         {
+            /*
             foreach (var dobj in DetectedObject)
             {
                 if (dobj.Type.Type == type)
@@ -132,6 +138,14 @@ namespace Server
                     DetectedObject.Remove(dobj);
                 }
             }
+            */
+
+            foreach (var obj in DetectedObject.Where(p => p.Type.Type == type))
+            {
+                //yield return obj.BitmapImage;
+                DetectedObject.Remove(obj);
+            }
+
             foreach (var res in Results)
             {
                 if (res.Type == type)

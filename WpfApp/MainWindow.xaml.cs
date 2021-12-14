@@ -91,11 +91,15 @@ namespace WpfApp
         {
             try
             {
-                string type = listBox_types.SelectedItem.ToString();
-                string result = await client.GetStringAsync("https://localhost:44394/results/types/" + type);
-                var objects = JsonConvert.DeserializeObject<IEnumerable<byte[]>>(result);
-                foreach (var obj in objects)
-                    listBox_objects.Items.Add(new { Image = obj });
+                if (listBox_types.Items.Count > 0)
+                {
+                    listBox_objects.Items.Clear();
+                    string type = listBox_types.SelectedItem.ToString();
+                    string result = await client.GetStringAsync("https://localhost:44394/results/types/" + type);
+                    var objects = JsonConvert.DeserializeObject<IEnumerable<byte[]>>(result);
+                    foreach (var obj in objects)
+                        listBox_objects.Items.Add(new { Image = obj });
+                }
                 //resultCollection.Add(b);
             }
             catch (Exception ex)
@@ -105,10 +109,27 @@ namespace WpfApp
             btnRun.IsEnabled = true;
         }
 
-        private void btnDelete_Click(object sender, RoutedEventArgs e)
+        private async void btnDelete_Click(object sender, RoutedEventArgs e)
         {
             //db.DeleteType(listBox_types.SelectedItem.ToString());
             // запрос на удаление типа
+            try
+            {
+
+                string type = listBox_types.SelectedItem.ToString();
+                var result = await client.DeleteAsync("https://localhost:44394/results/types/" + type);
+                //listBox_types.Items.Clear();
+                resultCollection.Clear();
+                string resType = await client.GetStringAsync("https://localhost:44394/results/types");
+                var allbooks = JsonConvert.DeserializeObject<IEnumerable<string>>(resType);
+                foreach (var b in allbooks)
+                    resultCollection.Add(b);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error");
+            }
         }
     }
 }
