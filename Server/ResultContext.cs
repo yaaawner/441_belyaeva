@@ -101,11 +101,11 @@ namespace Server
             }
         }
 
-        public IEnumerable<string> GetObjectsByType(string type)
+        public IEnumerable<byte[]> GetObjectsByType(string type)
         {
             foreach (var obj in DetectedObject.Where(p => p.Type.Type == type))
             {
-                yield return obj.Path;
+                yield return obj.BitmapImage;
             }
         }
 

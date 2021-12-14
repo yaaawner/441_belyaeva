@@ -36,7 +36,7 @@ namespace Server.Controllers
         }
 
         [HttpGet("types/{type}")]
-        public IEnumerable<string> /*string*/ GetObjectsByType(string type)
+        public IEnumerable<byte[]> /*string*/ GetObjectsByType(string type)
         {
             var db = new ResultContext();
             return db.GetObjectsByType(type);

@@ -55,20 +55,28 @@ namespace WpfApp
 
         private async void btnRun_Click(object sender, RoutedEventArgs e)
         {
+            
             btnRun.IsEnabled = false;
-            string result = await client.GetStringAsync("https://localhost:44394/results/types");
-            var allbooks = JsonConvert.DeserializeObject<IEnumerable<string>>(result);
-            foreach (var b in allbooks)
-                resultCollection.Add(b);
+            try
+            {
+                string result = await client.GetStringAsync("https://localhost:44394/results/types");
+                var allbooks = JsonConvert.DeserializeObject<IEnumerable<string>>(result);
+                foreach (var b in allbooks)
+                    resultCollection.Add(b);
                 //Console.WriteLine($"{b.Title}");
-            //resultCollection.Clear();
-            //db.Clear();
-            //Detector.cancelTokenSource = new CancellationTokenSource();
-            //Detector.token = Detector.cancelTokenSource.Token;
+                //resultCollection.Clear();
+                //db.Clear();
+                //Detector.cancelTokenSource = new CancellationTokenSource();
+                //Detector.token = Detector.cancelTokenSource.Token;
 
-            //await Task.WhenAll(Detector.DetectImage(TextBox_Path.Text), Consumer());
-            // запустить процесс разпознавания 
-            // отправляем путь, ответ все данные 
+                //await Task.WhenAll(Detector.DetectImage(TextBox_Path.Text), Consumer());
+                // запустить процесс разпознавания 
+                // отправляем путь, ответ все данные 
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error");
+            }
             btnRun.IsEnabled = true;
         }
 
@@ -79,9 +87,22 @@ namespace WpfApp
             btnRun.IsEnabled = true;
         }
 
-        private void listBox_types_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void listBox_types_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            try
+            {
+                string type = listBox_types.SelectedItem.ToString();
+                string result = await client.GetStringAsync("https://localhost:44394/results/types/" + type);
+                var objects = JsonConvert.DeserializeObject<IEnumerable<byte[]>>(result);
+                foreach (var obj in objects)
+                    listBox_objects.Items.Add(new { Image = obj });
+                //resultCollection.Add(b);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error");
+            }
+            btnRun.IsEnabled = true;
         }
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)

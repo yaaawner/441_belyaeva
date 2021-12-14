@@ -40,10 +40,14 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <ListBox Margin="200,84,30,45">
-            
+        <ListBox x:Name="listBox_objects" Margin="200,84,30,45">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <Image Source="{Binding Image}" Height="100" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
         </ListBox>
-       
-
     </Grid>
 </Window>
