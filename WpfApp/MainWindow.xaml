@@ -44,7 +44,7 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
-                        <Image Source="{Binding Path=OutputPath}" Height="100"/>
+                        <Image Source="{Binding BitmapImage}" Height="100"/>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
