@@ -45,7 +45,7 @@ namespace WpfApp
                 Bitmap bitmap;
                 float[] BBox;
 
-                (type, image, bitmap, BBox) = await Detector.resultBufferBlock.ReceiveAsync();
+                (type, bitmap, BBox) = await Detector.resultBufferBlock.ReceiveAsync();
                 if (type == "end")
                 {
                     db.SaveChanges();
@@ -53,7 +53,7 @@ namespace WpfApp
                 }
                 else
                 {
-                    db.AddElem(type, image, BBox, bitmap);
+                    db.AddElem(type, BBox, bitmap);
                 }
 
             }

@@ -12,18 +12,15 @@ namespace WpfApp
     public class DetectedObject
     {
         public int DetectedObjectId { get; set; }
-        public string Path { get; set; }
+        //public string Path { get; set; }
         public float x1 { get; set; }
         public float y1 { get; set; }
         public float x2 { get; set; }
         public float y2 { get; set; }
         public byte[] BitmapImage { get; set; }
-        public string OutputPath { get; set; }
+        //public string OutputPath { get; set; }
         public Results Type { get; set; }
-        public override string ToString()
-        {
-            return OutputPath;
-        }
+       
     }
 
     public class Results// : IEnumerable<string>
@@ -79,7 +76,7 @@ namespace WpfApp
             }
         }
 
-        public void AddElem (string type, string path, float[] BBox, Bitmap bitmap)
+        public void AddElem (string type, float[] BBox, Bitmap bitmap)
         {
             var dobj = new DetectedObject();
 
@@ -107,8 +104,8 @@ namespace WpfApp
                 dobj.x2 = BBox[2];
                 dobj.y2 = BBox[3];
                 dobj.BitmapImage = ImageToByte2(bitmap);
-                dobj.Path = path;
-                dobj.OutputPath = path;
+                //dobj.Path = path;
+                //dobj.OutputPath = path;
                 DetectedObject.Add(dobj);
             }
             
