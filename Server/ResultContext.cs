@@ -77,7 +77,8 @@ namespace Server
             } 
             else
             {
-                dobj.Type = new Results();
+                Results results = new Results();
+                dobj.Type = results;
                 dobj.Type.Type = type;
                 Results.Add(dobj.Type);
             }
@@ -97,6 +98,14 @@ namespace Server
             foreach (var res in Results)
             {
                 yield return res.Type;
+            }
+        }
+
+        public IEnumerable<string> GetObjectsByType(string type)
+        {
+            foreach (var obj in DetectedObject.Where(p => p.Type.Type == type))
+            {
+                yield return obj.Path;
             }
         }
 
