@@ -12,11 +12,6 @@ using System.Threading.Tasks.Dataflow;
 
 namespace Server
 {
-    public class ResultsView
-    {
-
-    }
-
     public class DetectedObject
     {
         public int DetectedObjectId { get; set; }
@@ -131,16 +126,6 @@ namespace Server
 
         public void DeleteType(string type)
         {
-            /*
-            foreach (var dobj in DetectedObject)
-            {
-                if (dobj.Type.Type == type)
-                {
-                    DetectedObject.Remove(dobj);
-                }
-            }
-            */
-
             foreach (var obj in DetectedObject.Where(p => p.Type.Type == type))
             {
                 //yield return obj.BitmapImage;
@@ -157,39 +142,10 @@ namespace Server
 
             SaveChanges();
         } 
-
-        /*
-        public IEnumerable<string> GetObjects (string type)
-        {
-            //var query = Results.Where()
-            foreach (var res in Results)
-            {
-                if (res.Type == type)
-                {
-                    foreach (var dobj in res.DetectedObjects)
-                    {
-                        yield return dobj.OutputPath;
-                    }
-                    break;
-                }
-            }
-        }
-        */
-        
-
-
-
-        //public IEnumerable<>
-
-
     }
 
     public class Sandbox
     {
-        //public static ResultContext db = new ResultContext();
-        //public static ObservableCollection<Results> resultCollection = new ObservableCollection<Results>();
-        //public static ObservableCollection<Results> resultCollection = db.Results.Local.ToObservableCollection();
-
         public static async Task Consumer()
         {
             var db = new ResultContext();
@@ -213,8 +169,6 @@ namespace Server
                     }
 
                 }
-            
         }
     }
-
 }

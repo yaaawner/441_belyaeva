@@ -13,6 +13,7 @@ namespace Server.Controllers
     public class ResultsController : Controller
     {
         string imageFolder = @"D:\models\Assets\Images";
+
         [HttpGet] 
         public string Get()
         {
@@ -22,18 +23,20 @@ namespace Server.Controllers
         [HttpGet("task")]
         public async Task GetTypesAsync()
         {
-            //var db = new ResultContext();
-            //db.Clear();
             await Task.WhenAll(Detector.DetectImage(imageFolder), Sandbox.Consumer());
+        }
+
+        [HttpGet("cancel")]
+        public void PutCancel()
+        {
+            Detector.cancelTokenSource.Cancel();
         }
 
         [HttpGet("types")]
         public IEnumerable<string> GetTypes()
         {
-            //await Task.WhenAll(Detector.DetectImage(imageFolder), Sandbox.Consumer());
             var db = new ResultContext();
-            
-                return db.GetTypes();
+            return db.GetTypes();
         }
 
         [HttpGet("types/{type}")]
@@ -41,7 +44,6 @@ namespace Server.Controllers
         {
             var db = new ResultContext();
             return db.GetObjectsByType(type);
-            //return type;
         }
 
         [HttpDelete("types/{type}")]
@@ -50,17 +52,5 @@ namespace Server.Controllers
             var db = new ResultContext();
             db.DeleteType(type);
         }
-        /*
-        [HttpGet("{type}")]
-        public IEnumerable<string> GetObjects(string type)
-        {
-            using (var db = new ResultContext())
-            {
-                return db.GetObjects(type);
-            }
-        }
-        */
-
     }
-
 }
