@@ -71,6 +71,7 @@ namespace Server
 
             dobj.Type = new Results();
             var query = Results.Where(p => type == p.Type);
+            byte[] byteArrImage = ImageToByte2(bitmap);
             if (query.Count() > 0)
             {
                 dobj.Type = query.First();
@@ -85,7 +86,7 @@ namespace Server
             var f = DetectedObject.Where(p => p.x1 == BBox[0] && p.y1 == BBox[1] && p.x2 == BBox[2] && p.y2 == BBox[3]
                                          && p.Type.Type == type);
 
-            if (f.Count() == 0)
+            if (f.Count() == 0 || !byteArrImage.SequenceEqual(f.First().BitmapImage))
             {
                 dobj.x1 = BBox[0];
                 dobj.y1 = BBox[1];

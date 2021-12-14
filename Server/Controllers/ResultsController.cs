@@ -22,15 +22,15 @@ namespace Server.Controllers
         [HttpGet("task")]
         public async Task GetTypesAsync()
         {
-            var db = new ResultContext();
-            db.Clear();
+            //var db = new ResultContext();
+            //db.Clear();
             await Task.WhenAll(Detector.DetectImage(imageFolder), Sandbox.Consumer());
         }
 
         [HttpGet("types")]
-        public async Task<IEnumerable<string>> GetTypes()
+        public IEnumerable<string> GetTypes()
         {
-            await Task.WhenAll(Detector.DetectImage(imageFolder), Sandbox.Consumer());
+            //await Task.WhenAll(Detector.DetectImage(imageFolder), Sandbox.Consumer());
             var db = new ResultContext();
             
                 return db.GetTypes();

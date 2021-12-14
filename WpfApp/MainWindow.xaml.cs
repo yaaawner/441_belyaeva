@@ -59,6 +59,10 @@ namespace WpfApp
             btnRun.IsEnabled = false;
             try
             {
+                listBox_objects.Items.Clear();
+                //listBox_types.Items.Clear();
+                resultCollection.Clear();
+                await client.GetAsync("https://localhost:44394/results/task/");
                 string result = await client.GetStringAsync("https://localhost:44394/results/types");
                 var allbooks = JsonConvert.DeserializeObject<IEnumerable<string>>(result);
                 foreach (var b in allbooks)
@@ -115,6 +119,7 @@ namespace WpfApp
             // запрос на удаление типа
             try
             {
+                listBox_objects.Items.Clear();
 
                 string type = listBox_types.SelectedItem.ToString();
                 var result = await client.DeleteAsync("https://localhost:44394/results/types/" + type);
