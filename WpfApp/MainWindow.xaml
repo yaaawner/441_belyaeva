@@ -30,7 +30,7 @@
 
         <Button x:Name="btnDelete" Content="Delete Type" HorizontalAlignment="Left" Margin="700,26,0,0" VerticalAlignment="Top" Click="btnDelete_Click" />
 
-        <ListBox x:Name="listBox_types"  ItemsSource="{Binding}" Margin="25,84,630,45" SelectionChanged="listBox_types_SelectionChanged">
+        <ListBox x:Name="listBox_types"  ItemsSource="{Binding}" Margin="25,84,630,45">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
