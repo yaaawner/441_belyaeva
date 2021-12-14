@@ -29,11 +29,9 @@ namespace WpfApp
     /// </summary>
     /// 
 
-
     public partial class MainWindow : Window
     {
         public static ResultContext db = new ResultContext();
-        //public static ObservableCollection<Results> resultCollection = new ObservableCollection<Results>();
         public static ObservableCollection<Results> resultCollection = db.Results.Local.ToObservableCollection();
 
         private static async Task Consumer()
@@ -41,7 +39,6 @@ namespace WpfApp
             while (true)
             {
                 string type;
-                string image;
                 Bitmap bitmap;
                 float[] BBox;
 
@@ -55,7 +52,6 @@ namespace WpfApp
                 {
                     db.AddElem(type, BBox, bitmap);
                 }
-
             }
         }
 
@@ -63,7 +59,6 @@ namespace WpfApp
         {
             InitializeComponent();
             DataContext = resultCollection;
-            //DataContext = db.Results;
         }
 
         private void btnSelect_Click(object sender, RoutedEventArgs e)
@@ -76,7 +71,6 @@ namespace WpfApp
         private async void btnRun_Click(object sender, RoutedEventArgs e)
         {
             btnRun.IsEnabled = false;
-            //resultCollection.Clear();
             db.Clear();
             Detector.cancelTokenSource = new CancellationTokenSource();
             Detector.token = Detector.cancelTokenSource.Token;
@@ -89,11 +83,6 @@ namespace WpfApp
         {
             Detector.cancelTokenSource.Cancel();
             btnRun.IsEnabled = true;
-        }
-
-        private void listBox_types_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
         }
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)

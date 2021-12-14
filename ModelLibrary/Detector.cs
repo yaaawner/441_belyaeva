@@ -97,7 +97,6 @@ namespace ModelLibrary
                     predict = predictionEngine.Predict(new YoloV4BitmapData() { Image = bitmap });
                 }
 
-                //using (var g = Graphics.FromImage(new Bitmap(Image.FromFile(Path.Combine(image)))))
                 var results = predict.GetResults(classesNames, 0.3f, 0.7f);
                 int i = 0; 
                 foreach (var res in results)
@@ -108,7 +107,6 @@ namespace ModelLibrary
                     var x2 = res.BBox[2];
                     var y2 = res.BBox[3];
 
-                    //Console.WriteLine(x1.ToString());
 
                     Rectangle cropRect = new Rectangle((int)x1, (int)y1, (int)(x2 - x1), (int)(y2 - y1));
                     Bitmap src = Image.FromFile(image) as Bitmap;
@@ -128,36 +126,7 @@ namespace ModelLibrary
                     {
                         await resultBufferBlock.SendAsync((res.Label, target, res.BBox));
                     }
-                    
-
-                    //target.
-                    //target.Save(Path.Combine(imageOutputFolder, Path.ChangeExtension(image, "_processed" + x1.ToString() + y1.ToString() + Path.GetExtension(image))));
-                    
                 }
-
-
-                /*
-                 using (var g = Graphics.FromImage(bitmap))
-                    {
-                        foreach (var res in results)
-                        {
-                            // draw predictions
-                            var x1 = res.BBox[0];
-                            var y1 = res.BBox[1];
-                            var x2 = res.BBox[2];
-                            var y2 = res.BBox[3];
-                            g.DrawRectangle(Pens.Red, x1, y1, x2 - x1, y2 - y1);
-                            using (var brushes = new SolidBrush(Color.FromArgb(50, Color.Red)))
-                            {
-                                g.FillRectangle(brushes, x1, y1, x2 - x1, y2 - y1);
-                            }
-
-                            g.DrawString(res.Label + " " + res.Confidence.ToString("0.00"),
-                                         new Font("Arial", 12), Brushes.Blue, new PointF(x1, y1));
-                        }
-                        bitmap.Save(Path.Combine(imageOutputFolder, Path.ChangeExtension(imageName, "_processed" + Path.GetExtension(imageName))));
-                    }
-                 */
             },
             new ExecutionDataflowBlockOptions
             {

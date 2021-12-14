@@ -23,35 +23,11 @@ namespace WpfApp
        
     }
 
-    public class Results// : IEnumerable<string>
+    public class Results
     {
         public int ResultsId { get; set; }
         public string Type { get; set; }
         public ICollection<DetectedObject> DetectedObjects { get; set; }
-
-        /*
-        public IEnumerator<string> GetEnumerator()
-        {
-            return ((IEnumerable<string>)DetectedObjects).GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable)DetectedObjects).GetEnumerator();
-        }
-        /*
-        public IEnumerator<DetectedObject> GetEnumerator()
-        {
-            //return ((IEnumerable<string>)images).GetEnumerator();
-            return DetectedObjects.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable)DetectedObjects).GetEnumerator();
-        }
-        */
-        
 
         public override string ToString()
         {
@@ -60,10 +36,8 @@ namespace WpfApp
     }
     public class ResultContext : DbContext
     {
-        //public UserContext() : base("DbConnection") { }
         public DbSet<Results> Results { get; set; }
         public DbSet<DetectedObject> DetectedObject { get; set; }
-        //public DbSet<DetectedObjectDetails> DetectedObjectDetails { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder o)
            => o.UseSqlite(@"Data Source=D:\MLResults.db");
 
@@ -93,7 +67,6 @@ namespace WpfApp
                 Results.Add(dobj.Type);
             }
 
-            //bool flagimg = true;
             var f = DetectedObject.Where(p => p.x1 == BBox[0] && p.y1 == BBox[1] && p.x2 == BBox[2] && p.y2 == BBox[3]
                                          && p.Type.Type == type);
 
@@ -104,8 +77,6 @@ namespace WpfApp
                 dobj.x2 = BBox[2];
                 dobj.y2 = BBox[3];
                 dobj.BitmapImage = ImageToByte2(bitmap);
-                //dobj.Path = path;
-                //dobj.OutputPath = path;
                 DetectedObject.Add(dobj);
             }
             
@@ -154,26 +125,5 @@ namespace WpfApp
 
             SaveChanges();
         } 
-
-        /*
-        public IEnumerable<string> GetObjects (string type)
-        {
-            //var query = Results.Where()
-            foreach (var res in Results)
-            {
-                if (res.Type == type)
-                {
-                    foreach (var dobj in res.DetectedObjects)
-                    {
-
-                    }
-                }
-            }
-        }
-        */
-
-
-
-        //public IEnumerable<>
     }
 }
