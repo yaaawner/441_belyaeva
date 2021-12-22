@@ -9,6 +9,11 @@ using ModelLibrary;
 
 namespace Server.Controllers
 {
+    public class Bag
+    {
+        public string Folder { get; set; }
+    }
+
     [ApiController]
     [Route("[controller]")]
     public class ResultsController : Controller
@@ -21,28 +26,16 @@ namespace Server.Controllers
             return "Test";
         }
 
-        [HttpGet("task")]
-        public async Task GetTypesAsync()
-        {
-            await Task.WhenAll(Detector.DetectImage(imageFolder), Sandbox.Consumer());
-        }
-
         [HttpPut]
-        public async Task PutAsync(string folder)
+        public async Task PutAsync(Bag bg)
         {
-            imageFolder = folder;
+            imageFolder = bg.Folder;
             Debug.WriteLine("===================== DEBUG ======================");
-            Debug.WriteLine(folder);
+            Debug.WriteLine(bg.Folder);
             Debug.WriteLine(imageFolder);
             await Task.WhenAll(Detector.DetectImage(imageFolder), Sandbox.Consumer());
         }
-        /*
-        [HttpGet("cancel")]
-        public void PutCancel()
-        {
-            Detector.cancelTokenSource.Cancel();
-        }
-        */
+        
         [HttpGet("types")]
         public IEnumerable<string> GetTypes()
         {

@@ -31,6 +31,11 @@ namespace WpfApp
     /// </summary>
     /// 
 
+    public class Bag
+    {
+        public string Folder { get; set; }
+    }
+
     public partial class MainWindow : Window
     {
         //public static ResultContext db = new ResultContext();
@@ -58,15 +63,23 @@ namespace WpfApp
             btnRun.IsEnabled = false;
             try
             {
+                /*
+                Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
+                if ((bool)dialog.ShowDialog())
+                {
+                    dialog.FileName;
+                }
+                */
+
                 listBox_objects.Items.Clear();
                 resultCollection.Clear();
-                //await client.GetAsync("https://localhost:44394/results/task/");
-                //HttpContent content = new HttpContent(HttpContent kjjk, )
-                var path = JsonConvert.SerializeObject(TextBox_Path.Text);
+   
+                Bag bg = new Bag() { Folder = TextBox_Path.Text };
+                var path = JsonConvert.SerializeObject(bg);
                 Debug.WriteLine(path);
                 var stringContent = new StringContent(path);
                 stringContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
-                Debug.WriteLine(stringContent);
+                //Debug.WriteLine(stringContent);
                 await client.PutAsync("https://localhost:44394/results", stringContent);
 
                 string result = await client.GetStringAsync("https://localhost:44394/results/types");
