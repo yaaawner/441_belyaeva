@@ -25,13 +25,13 @@ namespace Server.Controllers
         {
             await Task.WhenAll(Detector.DetectImage(imageFolder), Sandbox.Consumer());
         }
-
+        /*
         [HttpGet("cancel")]
         public void PutCancel()
         {
             Detector.cancelTokenSource.Cancel();
         }
-
+        */
         [HttpGet("types")]
         public IEnumerable<string> GetTypes()
         {

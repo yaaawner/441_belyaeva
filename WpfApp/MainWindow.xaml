@@ -23,11 +23,6 @@
                 HorizontalAlignment="Left" Height="20" Margin="460,26,0,0" 
                 VerticalAlignment="Top" Width="85"/>
 
-        <Button x:Name="btnCancel" Content="Cancel" 
-                Click="btnCancel_Click"
-                HorizontalAlignment="Left" Margin="585,26,0,0" VerticalAlignment="Top" 
-                RenderTransformOrigin="0.631,0.754" Width="75"/>
-
         <Button x:Name="btnDelete" Content="Delete Type" HorizontalAlignment="Left" Margin="700,26,0,0" VerticalAlignment="Top" Click="btnDelete_Click" />
 
         <ListBox x:Name="listBox_types"  ItemsSource="{Binding}" Margin="25,84,630,45" SelectionChanged="listBox_types_SelectionChanged">

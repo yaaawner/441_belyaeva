@@ -73,12 +73,13 @@ namespace WpfApp
             btnRun.IsEnabled = true;
         }
 
+        /*
         private async void btnCancel_Click(object sender, RoutedEventArgs e)
         {
             await client.GetAsync("https://localhost:44394/results/cancel");
             btnRun.IsEnabled = true;
         }
-
+        */
         private async void listBox_types_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
