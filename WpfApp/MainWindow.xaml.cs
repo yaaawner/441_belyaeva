@@ -22,6 +22,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Drawing;
 using System.Net.Http;
 using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace WpfApp
 {
@@ -59,7 +60,14 @@ namespace WpfApp
             {
                 listBox_objects.Items.Clear();
                 resultCollection.Clear();
-                await client.GetAsync("https://localhost:44394/results/task/");
+                //await client.GetAsync("https://localhost:44394/results/task/");
+                //HttpContent content = new HttpContent(HttpContent kjjk, )
+                var path = JsonConvert.SerializeObject(TextBox_Path.Text);
+                Debug.WriteLine(path);
+                var stringContent = new StringContent(path);
+                stringContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+                Debug.WriteLine(stringContent);
+                await client.PutAsync("https://localhost:44394/results", stringContent);
 
                 string result = await client.GetStringAsync("https://localhost:44394/results/types");
                 var allbooks = JsonConvert.DeserializeObject<IEnumerable<string>>(result);

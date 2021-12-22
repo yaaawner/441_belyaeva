@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -12,7 +13,7 @@ namespace Server.Controllers
     [Route("[controller]")]
     public class ResultsController : Controller
     {
-        string imageFolder = @"D:\models\Assets\Images";
+        private static string imageFolder = @"D:\models\Assets\Images";
 
         [HttpGet] 
         public string Get()
@@ -23,6 +24,16 @@ namespace Server.Controllers
         [HttpGet("task")]
         public async Task GetTypesAsync()
         {
+            await Task.WhenAll(Detector.DetectImage(imageFolder), Sandbox.Consumer());
+        }
+
+        [HttpPut]
+        public async Task PutAsync(string folder)
+        {
+            imageFolder = folder;
+            Debug.WriteLine("===================== DEBUG ======================");
+            Debug.WriteLine(folder);
+            Debug.WriteLine(imageFolder);
             await Task.WhenAll(Detector.DetectImage(imageFolder), Sandbox.Consumer());
         }
         /*
